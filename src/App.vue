@@ -1,9 +1,13 @@
-<script setup>
 
+<script setup>
+import Header from './components/header.vue';
+import Dashboard from './components/dashboard.vue';
 </script>
 
+
 <template>
-  <div class="">fdsafadsfdsafdsfsad</div>
+  <Header />
+  <Dashboard />
 </template>
 
 
