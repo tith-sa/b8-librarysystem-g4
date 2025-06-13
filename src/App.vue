@@ -1,5 +1,5 @@
 
-<script setup>
+<!-- <script setup>
 import Header from './components/header.vue';
 import Dashboard from './components/dashboard.vue';
 </script>
@@ -8,6 +8,11 @@ import Dashboard from './components/dashboard.vue';
 <template>
   <Header />
   <Dashboard />
+</template> -->
+
+
+<template>
+  <div id="app">
+    <router-view />
+  </div>
 </template>
-
-

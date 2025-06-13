@@ -1,12 +1,13 @@
 <script setup>
-
+import layoutdashboard from '../components/layoutdashboard.vue';
 
 </script>
 
 <template>
-  <div class=" bg-[#F8F8E1] rounded-2xl shadow -mt-10">
+  <layoutdashboard />
+  <div class=" bg-[#F8F8E1] rounded-2xl shadow -mt-120 ms-70">
        <div class="w-[63rem] h-auto">
-        <div class="w-[90%] mx-auto mt-5">
+        <div class="w-[90%] mx-auto mt-5 py-5">
           <h1 class="text-4xl font-bold">Welcome to Students page</h1>
         </div>
       </div>
