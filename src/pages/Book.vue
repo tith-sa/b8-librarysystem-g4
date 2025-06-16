@@ -17,37 +17,39 @@ const books = [
         <a class="text-[#FF90BB]">internet</a>
       </p>
       <p class="indent-8">jun 11 , 2025 I Wednesday, 8:00 am</p>
-
       <!-- Button aligned to the right -->
       <div class="flex justify-end pr-8 mt-10">
-        <button class="bg-[#FF90BB] text-white font-bold py-2 px-4 rounded">
+        <button
+          class="hover:bg-[#FF90BB] bg-pink-600 hover:shadow-2xl text-white font-bold py-2 px-4 rounded"
+        >
           Add New Book
         </button>
       </div>
 
       <!-- Table container filling full width of parent -->
-      <div class="w-full mt-5 p-4 bg-white rounded-2xl">
-        <table class="w-full text-left border-collapse text-lg">
-          <thead class="bg-gray-100 font-bold border-b text-center p-4">
-            <tr>
-              <th class="py-3 px-4 w-1/3">Book ID</th>
-              <th class="px-3 w-1/3">Book Title</th>
-              <th class="px-3 w-1/3">Incoming Books</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="book in books"
-              :key="book.id"
-              class="border-b text-center"
-            >
-              <td class="py-2 px-4">{{ book.id }}</td>
-              <td class="px-4">{{ book.title }}</td>
-              <td class="px-4">{{ book.count }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <p class="text-[#FF90BB] text-right mt-2">See all</p>
+
+      <table class="divide-y divide-gray-200 w-[90%] mx-auto mt-5">
+        <thead class="bg-white">
+          <tr>
+            <th class="py-3 px-4 w-1/3">Book ID</th>
+            <th class="px-3 w-1/3">Book Title</th>
+            <th class="px-3 w-1/3">Incoming Books</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr v-for="book in books" :key="book.id" class="text-center bg-white">
+            <td class="py-2 px-4">{{ book.id }}</td>
+            <td class="px-4">{{ book.title }}</td>
+            <td class="px-4">{{ book.count }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="text-right mt-4 w-[90%] mx-auto">
+        <a
+          href="#"
+          class="text-pink-400 hover:text-pink-600 text-sm font-semibold"
+          >See All</a
+        >
       </div>
     </div>
   </div>
