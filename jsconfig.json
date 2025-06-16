@@ -1,5 +1,5 @@
-{ 
-  "compilerOptoins":{
+{
+  "compilerOptoins": {
     "paths": {
       "@/*": ["./src/*"]
     }
