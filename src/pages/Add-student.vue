@@ -23,11 +23,10 @@ const handleSubmit = () => {
         <!-- Back button -->
         <span class="text-xl mr-1 border text-pink-500">←</span>
 
-        <a
-          href="/home"
+        <router-link to="/student"
           class="inline-block mb-4 text-black hover:text-pink-800 font-semibold text-[24px]"
           >Back
-        </a>
+      </router-link>
 
         <!-- Heading -->
         <h1 class="text-4xl font-bold mb-8 text-center">
@@ -76,12 +75,14 @@ const handleSubmit = () => {
             />
           </div>
 
-          <button
+          <router-link to="/add-student">
+            <button
             type="submit"
             class="w-full bg-pink-400 hover:bg-pink-500 text-white font-semibold py-2 rounded-md mt-4"
           >
             Add Student
           </button>
+          </router-link>
         </form>
       </div>
     </div>

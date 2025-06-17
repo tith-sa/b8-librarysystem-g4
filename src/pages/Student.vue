@@ -23,16 +23,16 @@ const students = [
   <div class="bg-[#F8F8E1] rounded-2xl shadow -mt-115 ms-70 p-3">
     <div class="w-[63rem] h-auto">
       <div class="w-[90%] mx-auto py-5">
-        <h1 class="text-4xl font-bold">Welcome to Students page</h1>
+        <h1 class="text-4xl font-bold">Welcome to </h1>
+        <h1 class="text-4xl font-bold text-pink-500 ms-56 -mt-10">Students page</h1>
         <p class="text-2xl">jun 11 , 2025 | Wednesday, 8:00 am</p>
       </div>
     </div>
-    <div
-      class="w-[20%] ml-[760px] rounded-sm px-4 py-2 ms-4 bg-pink-500 hover:bg-pink-800 hover:shadow-2xl"
+    <router-link to="/add-student"
+      class=" hover:bg-pink-800 hover:shadow-2xl"
     >
-      <p class="font-bold text-center text-white">+ Add New Student</p>
-    </div>
-    <router-link to="" class="rounded-xl text-white"> </router-link>
+      <p class="bg-pink-500 rounded-xl w-[20%] px-4 py-2 ms-[750px] font-bold text-center text-white cursor-pointer">+ Add New Student</p>
+    </router-link>
     <table class="divide-gray-200 w-[90%] mx-auto mt-5">
       <thead class="bg-white">
         <tr>

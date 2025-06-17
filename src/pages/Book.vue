@@ -18,13 +18,13 @@ const books = [
       </p>
       <p class="indent-8">jun 11 , 2025 I Wednesday, 8:00 am</p>
       <!-- Button aligned to the right -->
-      <div class="flex justify-end pr-8 mt-10">
+      <router-link to="/Add-book" class="flex justify-end pr-8 mt-10">
         <button
-          class="hover:bg-[#FF90BB] bg-pink-600 hover:shadow-2xl text-white font-bold py-2 px-4 rounded"
+          class="hover:bg-[#FF90BB] bg-pink-600 hover:shadow-2xl text-white font-bold py-2 px-4 rounded cursor-pointer"
         >
           Add New Book
         </button>
-      </div>
+      </router-link>
 
       <!-- Table container filling full width of parent -->
 

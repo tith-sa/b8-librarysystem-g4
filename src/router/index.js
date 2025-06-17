@@ -5,6 +5,7 @@ import Student from "../pages/Student.vue";
 import Book from "../pages/Book.vue";
 import Login from "../pages/Login.vue";
 import AddStudent from "../pages/Add-student.vue";
+import AddBook from "../pages/Add-book.vue";
 
 const routes = [
   { path: "/", name: "Login", component: Login },
@@ -13,6 +14,8 @@ const routes = [
   { path: "/Student", name: "Student", component: Student },
   { path: "/book", name: "Book", component: Book },
   { path: "/add-student", name: "AddStudent", component: AddStudent },
+  { path: "/add-book", name: "AddBook", component: AddBook },
+
 ];
 
 const router = createRouter({
