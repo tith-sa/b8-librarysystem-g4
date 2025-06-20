@@ -54,6 +54,8 @@
 <script setup>
 import { ref } from "vue";
 
+import "primeicons/primeicons.css";
+
 const isChecked = ref(false);
 import loginimage from "../assets/login-image.png";
 </script>
