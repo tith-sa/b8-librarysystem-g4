@@ -12,18 +12,18 @@ const books = [
   <layoutdashboard />
   <div class="bg-[#F8F8E1] rounded-2xl shadow -mt-120 ms-70">
     <div class="w-[63rem] h-auto">
-      <p class="text-[40px] font-bold indent-8 mt-4">
-        Welcome,
-        <a class="text-[#FF90BB]">internet</a>
-      </p>
-      <p class="indent-8">jun 11 , 2025 I Wednesday, 8:00 am</p>
+      <div class="w-[90%] mx-auto py-5">
+        <h1 class="text-4xl font-bold">Welcome to</h1>
+        <h1 class="text-4xl font-bold text-pink-500 ms-56 -mt-10">Book page</h1>
+        <p class="text-2xl">jun 11 , 2025 | Wednesday, 8:00 am</p>
+      </div>
       <!-- Button aligned to the right -->
-      <router-link to="/Add-book" class="flex justify-end pr-8 mt-10">
-        <button
-          class="hover:bg-[#FF90BB] bg-pink-600 hover:shadow-2xl text-white font-bold py-2 px-4 rounded cursor-pointer"
+      <router-link to="/Add-book" class="hover:bg-pink-800 hover:shadow-2xl">
+        <p
+          class="bg-pink-500 rounded-xl w-[20%] px-4 py-2 ms-[750px] font-bold text-center text-white cursor-pointer"
         >
-          Add New Book
-        </button>
+          + Add New Book
+        </p>
       </router-link>
 
       <!-- Table container filling full width of parent -->
@@ -31,16 +31,22 @@ const books = [
       <table class="divide-y divide-gray-200 w-[90%] mx-auto mt-5">
         <thead class="bg-white">
           <tr>
-            <th class="py-3 px-4 w-1/3">Book ID</th>
-            <th class="px-3 w-1/3">Book Title</th>
-            <th class="px-3 w-1/3">Incoming Books</th>
+            <th class="px-6 py-3 text-sm font-semibold text-gray-900">
+              Book ID
+            </th>
+            <th class="px-6 py-3 text-sm font-semibold text-gray-900">
+              Book Title
+            </th>
+            <th class="px-6 py-3 text-sm font-semibold text-gray-900">
+              Incoming Books
+            </th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr v-for="book in books" :key="book.id" class="text-center bg-white">
-            <td class="py-2 px-4">{{ book.id }}</td>
-            <td class="px-4">{{ book.title }}</td>
-            <td class="px-4">{{ book.count }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ book.id }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ book.title }}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">{{ book.count }}</td>
           </tr>
         </tbody>
       </table>
