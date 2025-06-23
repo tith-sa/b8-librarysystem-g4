@@ -60,7 +60,7 @@ const nextPage = () => {
 
 <template>
   <layoutdashboard />
-  <div class="h-20"></div>
+  <div class="h-26"></div>
   <div class="bg-[#F8F8E1] rounded-2xl shadow ms-72 p-10 max-w-6xl mx-auto">
 
     <div class="mb-10">
