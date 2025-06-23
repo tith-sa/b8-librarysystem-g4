@@ -1,30 +1,50 @@
 <template>
-  <header class="bg-[#F8F8E1]">
-    <div class="flex justify-between px-4">
-      <div class="w-40 h-20">
-        <img class="w-full h-full" :src="logo" alt="Image" />
+  <header class="w-full bg-[#F8F8E1] shadow-md py-3 px-6 fixed">
+    <div class="flex justify-between items-center max-w-[1200px] mx-auto">
+
+      <div class="flex items-center gap-4">
+        <img class="w-16 h-16 object-contain" :src="logo" alt="Logo" />
+        <h1 class="text-xl font-bold text-gray-800">Library System</h1>
       </div>
 
-      <div class="w-90 h-20 flex justify-between">
-        <div class="w-40 ms-4 mt-2">
-          <h1 class="text-lg font-bold">Chantha Makara</h1>
-          <p class="text-sm ml-0 text-gray-500">Librarian</p>
+
+      <div class="relative flex items-center gap-4">
+
+        <div class="text-right">
+          <h2 class="text-md font-semibold text-gray-800">Chantha Makara</h2>
+          <p class="text-sm text-gray-500">Librarian</p>
         </div>
-        <div class="rounded-full mt-2">
+
+  
+        <div class="relative">
           <img
-            class="w-20 h-[95%] shadow-xl rounded-full"
             :src="makara"
-            alt="Image"
+            alt="User Avatar"
+            class="w-14 h-14 rounded-full shadow-lg border-2 border-pink-400 object-cover cursor-pointer"
+            @click="toggleDropdown"
           />
-        </div>
-        <div>
-          <router-link to="/login" class="rounded-xl text-white">
+
+
+          <transition name="fade">
             <div
-              class="rounded-xl px-4 py-2 ms-4 bg-pink-500 mt-5 hover:bg-pink-800 hover:shadow-2xl"
+              v-if="dropdownOpen"
+              ref="dropdown"
+              class="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg z-50"
             >
-              <p class="font-bold">Logout</p>
+              <ul class="py-2 text-sm text-gray-700">
+    
+                <li>
+                  <button
+                    @click="logout"
+                    class="w-full text-left px-4 py-2 hover:bg-gray-100 transition text-red-500 cursor-pointer"
+                  >
+                     Logout
+                  </button>
+                </li>
+
+              </ul>
             </div>
-          </router-link>
+          </transition>
         </div>
       </div>
     </div>
@@ -32,6 +52,45 @@
 </template>
 
 <script setup>
-import logo from "../assets/logo.png";
-import makara from "../assets/makara.png";
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
+import logo from '../assets/logo.png'
+import makara from '../assets/makara.png'
+
+const router = useRouter()
+const dropdownOpen = ref(false)
+const dropdown = ref(null)
+
+const toggleDropdown = () => {
+  dropdownOpen.value = !dropdownOpen.value
+}
+
+const logout = () => {
+  localStorage.removeItem('token')
+  router.push('/login')
+}
+
+
+const handleClickOutside = (event) => {
+  if (dropdown.value && !dropdown.value.contains(event.target)) {
+    dropdownOpen.value = false
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+})}
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

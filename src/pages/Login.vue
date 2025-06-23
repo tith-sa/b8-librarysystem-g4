@@ -41,7 +41,7 @@
 
         <button
           type="submit"
-          class="bg-pink-500 py-2 px-4 rounded text-white hover:bg-pink-600 w-full font-bold"
+          class="bg-pink-500 py-2 px-4 rounded text-white hover:bg-pink-600 w-full font-bold cursor-pointer"
         >
           Login
         </button>
