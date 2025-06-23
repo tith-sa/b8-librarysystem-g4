@@ -11,7 +11,11 @@
         <p class="text-center mb-6">Please login before using the system!</p>
 
         <div>
-          <label for="username" class="block text-lg font-bold text-gray-700 mb-2">Username:</label>
+          <label
+            for="username"
+            class="block text-lg font-bold text-gray-700 mb-2"
+            >Username:</label
+          >
           <input
             type="text"
             id="username"
@@ -23,7 +27,11 @@
         </div>
 
         <div>
-          <label for="password" class="block text-lg font-bold text-gray-700 mb-2">Password:</label>
+          <label
+            for="password"
+            class="block text-lg font-bold text-gray-700 mb-2"
+            >Password:</label
+          >
           <input
             type="password"
             id="password"
@@ -46,7 +54,9 @@
           Login
         </button>
 
-        <p v-if="errorMessage" class="text-red-500 text-center mt-2">{{ errorMessage }}</p>
+        <p v-if="errorMessage" class="text-red-500 text-center mt-2">
+          {{ errorMessage }}
+        </p>
       </form>
     </div>
   </div>
@@ -71,7 +81,13 @@ const handleLogin = async () => {
       username: username.value,
       password: password.value,
     });
+<<<<<<< HEAD
     localStorage.setItem("token", response.data.token);
+=======
+
+    localStorage.setItem("token", response.data.token);
+
+>>>>>>> api-books
     router.push("/home");
   } catch (error) {
     if (error.response && error.response.data && error.response.data.message) {
