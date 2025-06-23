@@ -1,6 +1,6 @@
 <script setup>
 import layoutdashboard from '../components/layoutdashboard.vue';
-import 'primeicons/primeicons.css'
+
 
 </script>
 
