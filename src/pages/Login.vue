@@ -41,7 +41,7 @@
 
         <button
           type="submit"
-          class="bg-pink-500 py-2 px-4 rounded text-white hover:bg-pink-600 w-full font-bold cursor-pointer"
+          class="bg-pink-500 py-2 px-4 rounded text-white hover:bg-pink-600 w-full font-bold"
         >
           Login
         </button>
@@ -71,10 +71,7 @@ const handleLogin = async () => {
       username: username.value,
       password: password.value,
     });
-
-    // Optional: save token or user info if returned
-    // localStorage.setItem("token", response.data.token);
-
+    localStorage.setItem("token", response.data.token);
     router.push("/home");
   } catch (error) {
     if (error.response && error.response.data && error.response.data.message) {

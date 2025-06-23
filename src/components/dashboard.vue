@@ -2,6 +2,7 @@
 import home1 from '../assets/home(1).png'
 import student1 from '../assets/student.png'
 import book from '../assets/book.png'
+import borrow from '../assets/borrow.png'
 </script>
 
 <template>
@@ -48,7 +49,7 @@ import book from '../assets/book.png'
         class="flex items-center gap-4 px-4 py-3 rounded-xl transition duration-200 hover:bg-pink-100 hover:text-pink-600 font-medium text-gray-700"
         :class="{ 'bg-pink-200 text-pink-700': $route.path === '/borrow' }"
       >
-        <img class="w-6 h-6" :src="book" />
+        <img class="w-6 h-6" :src="borrow" />
         <span class="text-lg">Borrow</span>
       </router-link>
     </nav>
