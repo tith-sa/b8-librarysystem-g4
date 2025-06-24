@@ -6,8 +6,9 @@ import layoutdashboard from "../components/layoutdashboard.vue";
 const books = ref([]);
 const filteredBooks = ref([]);
 const searchQuery = ref("");
+const selectedCategory = ref("");
 const currentPage = ref(1);
-const itemsPerPage = 10;
+const itemsPerPage = 5;
 let debounceTimeout = null;
 
 async function fetchBooks() {
@@ -31,21 +32,45 @@ async function fetchBooks() {
 
 onMounted(fetchBooks);
 
-watch(searchQuery, (newVal) => {
+// Helper: get unique categories from books
+const categories = computed(() => {
+  const cats = books.value.map((b) => b.category);
+  return [...new Set(cats)].filter((c) => c); // unique & exclude falsy
+});
+
+function applyFilters() {
+  const query = searchQuery.value.toLowerCase();
+  const category = selectedCategory.value;
+
+  filteredBooks.value = books.value.filter((book) => {
+    const matchesQuery =
+      book.title.toLowerCase().includes(query) ||
+      book.id.toString().toLowerCase().includes(query);
+
+    const matchesCategory = category === "" || book.category === category;
+
+    return matchesQuery && matchesCategory;
+  });
+
+  currentPage.value = 1;
+}
+
+// Watchers with debounce for search input
+watch(searchQuery, () => {
   clearTimeout(debounceTimeout);
   debounceTimeout = setTimeout(() => {
-    const query = newVal.toLowerCase();
-    filteredBooks.value = books.value.filter(
-      (book) =>
-        book.title.toLowerCase().includes(query) ||
-        book.id.toLowerCase().includes(query)
-    );
-    currentPage.value = 1;
+    applyFilters();
   }, 300);
 });
 
+// Watch category filter immediately
+watch(selectedCategory, () => {
+  applyFilters();
+});
+
 const sortedBooks = computed(() => {
-  return [...filteredBooks.value].sort((a, b) => a.count - b.count);
+  // Sort by quantity ascending
+  return [...filteredBooks.value].sort((a, b) => a.quantity - b.quantity);
 });
 
 const paginatedBooks = computed(() => {
@@ -96,6 +121,20 @@ function nextPage() {
           placeholder="Search by title or ID..."
           class="px-4 py-2 w-72 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400 transition"
         />
+
+        <select
+          v-model="selectedCategory"
+          class="px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400 transition"
+        >
+          <option value="">All Categories</option>
+          <option
+            v-for="cat in categories"
+            :key="cat"
+            :value="cat"
+          >
+            {{ cat }}
+          </option>
+        </select>
       </div>
 
       <div class="bg-white shadow-lg rounded-xl overflow-hidden">
@@ -104,7 +143,9 @@ function nextPage() {
             <tr>
               <th class="px-6 py-4">Book ID</th>
               <th class="px-6 py-4">Title</th>
-              <th class="px-6 py-4">Incoming</th>
+              <th class="px-6 py-4">Author</th>
+              <th class="px-6 py-4">Category</th>
+              <th class="px-6 py-4">Quantity</th>
             </tr>
           </thead>
           <tbody class="text-gray-700 text-sm">
@@ -115,11 +156,13 @@ function nextPage() {
             >
               <td class="px-6 py-4 font-medium">{{ book.id }}</td>
               <td class="px-6 py-4">{{ book.title }}</td>
-              <td class="px-6 py-4">{{ book.count }}</td>
+              <td class="px-6 py-4">{{ book.author_name }}</td>
+              <td class="px-6 py-4">{{ book.category }}</td>
+              <td class="px-6 py-4">{{ book.quantity }}</td>
             </tr>
 
             <tr v-if="paginatedBooks.length === 0">
-              <td colspan="3" class="text-center text-gray-500 py-6">
+              <td colspan="5" class="text-center text-gray-500 py-6">
                 No books found.
               </td>
             </tr>
