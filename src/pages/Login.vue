@@ -81,13 +81,9 @@ const handleLogin = async () => {
       username: username.value,
       password: password.value,
     });
-<<<<<<< HEAD
-    localStorage.setItem("token", response.data.token);
-=======
 
     localStorage.setItem("token", response.data.token);
 
->>>>>>> api-books
     router.push("/home");
   } catch (error) {
     if (error.response && error.response.data && error.response.data.message) {

@@ -1,36 +1,49 @@
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
+import axios from "axios";
 import layoutdashboard from "../components/layoutdashboard.vue";
 
-const allBorrows = ref([
-  { studentId: "22527-1", bookId: "B1001", author: "George Orwell", borrowDate: "2025-06-10", returnDate: "2025-06-20" },
-  { studentId: "21076-4", bookId: "B1002", author: "J.K. Rowling", borrowDate: "2025-06-11", returnDate: "2025-06-25" },
-  { studentId: "22288-1", bookId: "B1003", author: "Dan Brown", borrowDate: "2025-06-12", returnDate: "2025-06-26" },
-  { studentId: "17601-2", bookId: "B1004", author: "Jane Austen", borrowDate: "2025-06-13", returnDate: "2025-06-23" },
-  { studentId: "99181-3", bookId: "B1005", author: "Mark Twain", borrowDate: "2025-06-14", returnDate: "2025-06-24" },
-  { studentId: "55811-1", bookId: "B1006", author: "Leo Tolstoy", borrowDate: "2025-06-15", returnDate: "2025-06-30" },
-  { studentId: "34218-9", bookId: "B1007", author: "Agatha Christie", borrowDate: "2025-06-16", returnDate: "2025-07-01" },
-  { studentId: "88123-7", bookId: "B1008", author: "Charles Dickens", borrowDate: "2025-06-17", returnDate: "2025-07-03" },
-  { studentId: "67121-3", bookId: "B1009", author: "Stephen King", borrowDate: "2025-06-18", returnDate: "2025-07-04" },
-  { studentId: "80112-7", bookId: "B1010", author: "Ernest Hemingway", borrowDate: "2025-06-19", returnDate: "2025-07-05" },
-  { studentId: "13121-8", bookId: "B1011", author: "F. Scott Fitzgerald", borrowDate: "2025-06-20", returnDate: "2025-07-10" },
-  { studentId: "50192-4", bookId: "B1012", author: "Emily Brontë", borrowDate: "2025-06-21", returnDate: "2025-07-11" },
-  { studentId: "41892-0", bookId: "B1013", author: "Toni Morrison", borrowDate: "2025-06-22", returnDate: "2025-07-12" },
-  { studentId: "38191-9", bookId: "B1014", author: "H.G. Wells", borrowDate: "2025-06-23", returnDate: "2025-07-15" },
-  { studentId: "10001-1", bookId: "B1015", author: "Isaac Asimov", borrowDate: "2025-06-24", returnDate: "2025-07-16" },
-  { studentId: "10002-2", bookId: "B1016", author: "Arthur C. Clarke", borrowDate: "2025-06-25", returnDate: "2025-07-18" },
-  { studentId: "10003-3", bookId: "B1017", author: "Aldous Huxley", borrowDate: "2025-06-26", returnDate: "2025-07-19" },
-  { studentId: "10004-4", bookId: "B1018", author: "Ray Bradbury", borrowDate: "2025-06-27", returnDate: "2025-07-20" },
-  { studentId: "10005-5", bookId: "B1019", author: "Jules Verne", borrowDate: "2025-06-28", returnDate: "2025-07-21" },
-  { studentId: "10006-6", bookId: "B1020", author: "Franz Kafka", borrowDate: "2025-06-29", returnDate: "2025-07-22" },
-]);
+// Token (you provided it)
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImxpYmVyaWFuIiwiaWF0IjoxNzUwNzM1MzEzfQ._aPCMT_iEq_Izy6s5q9CZv7BrwANN0cb1idQYwIz8-8";
 
+const allBorrows = ref([]);
+const filteredBorrows = ref([]);
 const searchQuery = ref("");
 const currentPage = ref(1);
 const itemsPerPage = 10;
-const filteredBorrows = ref([...allBorrows.value]);
-
+const totalPages = ref(1);
 let debounceTimeout = null;
+
+// Fetch borrow data from API with token
+const fetchBorrows = async () => {
+  try {
+    const res = await axios.get(
+      `http://localhost:3000/api/borrows?page=${currentPage.value}&limit=${itemsPerPage}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    allBorrows.value = res.data.borrows.map((item) => ({
+      studentId: item.id_card,
+      bookId: item.title,
+      author: item.full_name,
+      borrowDate: item.borrow_date.slice(0, 10),
+      returnDate: item.return_date.slice(0, 10),
+    }));
+    filteredBorrows.value = [...allBorrows.value];
+    totalPages.value = res.data.totalPages;
+  } catch (error) {
+    console.error("Error fetching borrows:", error);
+    alert("⚠️ Unauthorized. Please check your token.");
+  }
+};
+
+onMounted(fetchBorrows);
+
+// Watch search input
 watch(searchQuery, (val) => {
   clearTimeout(debounceTimeout);
   debounceTimeout = setTimeout(() => {
@@ -50,16 +63,18 @@ const paginatedBorrows = computed(() => {
   return filteredBorrows.value.slice(start, start + itemsPerPage);
 });
 
-const totalPages = computed(() =>
-  Math.ceil(filteredBorrows.value.length / itemsPerPage)
-);
-
 const prevPage = () => {
-  if (currentPage.value > 1) currentPage.value--;
+  if (currentPage.value > 1) {
+    currentPage.value--;
+    fetchBorrows();
+  }
 };
 
 const nextPage = () => {
-  if (currentPage.value < totalPages.value) currentPage.value++;
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+    fetchBorrows();
+  }
 };
 </script>
 
@@ -81,11 +96,11 @@ const nextPage = () => {
           Add New Student
         </button>
       </router-link>
-      
+
       <input
         v-model="searchQuery"
         type="text"
-        placeholder="Search by Student ID, Book ID, Author..."
+        placeholder="Search by Student ID, Book Title, or Name..."
         class="px-4 py-2 w-72 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400 transition"
       />
     </div>
@@ -95,8 +110,8 @@ const nextPage = () => {
         <thead class="bg-pink-100 text-gray-700 text-md">
           <tr>
             <th class="px-6 py-4">Student ID</th>
-            <th class="px-6 py-4">Book ID</th>
-            <th class="px-6 py-4">Author</th>
+            <th class="px-6 py-4">Book Title</th>
+            <th class="px-6 py-4">Student Name</th>
             <th class="px-6 py-4">Borrow Date</th>
             <th class="px-6 py-4">Return Date</th>
           </tr>
