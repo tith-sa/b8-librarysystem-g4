@@ -1,60 +1,77 @@
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import layoutdashboard from "../components/layoutdashboard.vue";
-
-const allStudents = [
-  { id: "22527-1", name: "Chantha Makara", books: 50, department: "Technology" },
-  { id: "21076-4", name: "Phorn Sreypheak", books: 20, department: "Technology" },
-  { id: "22288-1", name: "Rith Sophea", books: 15, department: "Technology" },
-  { id: "17601-2", name: "Tith Sa", books: 1, department: "Technology" },
-  { id: "99181-3", name: "Ly Mey", books: 10, department: "Engineering" },
-  { id: "76182-2", name: "Pov Dara", books: 7, department: "Science" },
-  { id: "34218-9", name: "Sok Nina", books: 5, department: "Literature" },
-  { id: "88123-7", name: "Kim Sovan", books: 18, department: "Law" },
-  { id: "55811-1", name: "Van Nita", books: 12, department: "Art" },
-  { id: "67121-3", name: "Sreyneang Chum", books: 22, department: "Mathematics" },
-  { id: "13121-8", name: "Mak Sitha", books: 4, department: "Business" },
-  { id: "50192-4", name: "Long Phalla", books: 2, department: "Physics" },
-  { id: "41892-0", name: "Chea Veasna", books: 9, department: "Technology" },
-  { id: "80112-7", name: "Touch Vuthy", books: 17, department: "Biology" },
-  { id: "38191-9", name: "Nget Darith", books: 6, department: "Chemistry" },
-];
 
 const searchQuery = ref("");
 const currentPage = ref(1);
-const itemsPerPage = 10;
-const filteredStudents = ref([...allStudents]);
+const itemsPerPage = ref(10);
 
+const totalPages = ref(0);
+const totalStudents = ref(0);
+const filteredStudents = ref([]);
+const paginatedStudents = ref([]);
 
+// Define the token
+const token =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImxpYmVyaWFuIiwiaWF0IjoxNzUwNzQ1Njk3fQ.DghyoAIuyX2oyf08QLH30U4NJRBhkGT80Up3Vwolc9Y";
+
+const fetchStudents = async () => {
+  try {
+    const response = await fetch(
+      `http://localhost:3000/api/students?page=${currentPage.value}&limit=${itemsPerPage.value}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+    const data = await response.json();
+    totalPages.value = data.totalPages;
+    totalStudents.value = data.totalStudents;
+    filteredStudents.value = data.students;
+    paginatedStudents.value = data.students;
+  } catch (error) {
+    console.error("Failed to fetch students:", error);
+    alert("Failed to load students. Please check your token or API endpoint.");
+  }
+};
+
+// Search functionality with debounce
 let debounceTimeout = null;
 watch(searchQuery, (val) => {
   clearTimeout(debounceTimeout);
   debounceTimeout = setTimeout(() => {
     const query = val.toLowerCase();
-    filteredStudents.value = allStudents.filter(
+    paginatedStudents.value = filteredStudents.value.filter(
       (s) =>
-        s.name.toLowerCase().includes(query) ||
-        s.id.toLowerCase().includes(query) ||
-        s.department.toLowerCase().includes(query)
+        s.full_name.toLowerCase().includes(query) ||
+        s.id_card.toLowerCase().includes(query) ||
+        s.class.toLowerCase().includes(query)
     );
     currentPage.value = 1;
   }, 300);
 });
 
-const paginatedStudents = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  return filteredStudents.value.slice(start, start + itemsPerPage);
+// Fetch students when the component is mounted
+onMounted(() => {
+  fetchStudents();
 });
 
-const totalPages = computed(() =>
-  Math.ceil(filteredStudents.value.length / itemsPerPage)
-);
-
 const prevPage = () => {
-  if (currentPage.value > 1) currentPage.value--;
+  if (currentPage.value > 1) {
+    currentPage.value--;
+    fetchStudents();
+  }
 };
 const nextPage = () => {
-  if (currentPage.value < totalPages.value) currentPage.value++;
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+    fetchStudents();
+  }
 };
 </script>
 
@@ -62,11 +79,14 @@ const nextPage = () => {
   <layoutdashboard />
   <div class="h-26"></div>
   <div class="bg-[#F8F8E1] rounded-2xl shadow ms-72 p-10 max-w-6xl mx-auto">
-
     <div class="mb-10">
       <h1 class="text-4xl font-extrabold text-gray-800">Welcome to</h1>
-      <h1 class="text-4xl font-extrabold text-pink-500 -mt-9.5 ms-56">Students Page</h1>
-      <p class="text-gray-600 text-sm mt-2">June 11, 2025 | Wednesday, 8:00 AM</p>
+      <h1 class="text-4xl font-extrabold text-pink-500 -mt-9.5 ms-56">
+        Students Page
+      </h1>
+      <p class="text-gray-600 text-sm mt-2">
+        June 11, 2025 | Wednesday, 8:00 AM
+      </p>
     </div>
 
     <div class="flex flex-wrap justify-between items-center mb-6 gap-3">
@@ -81,7 +101,7 @@ const nextPage = () => {
       <input
         v-model="searchQuery"
         type="text"
-        placeholder="Search by ID, Name, Department..."
+        placeholder="Search by Name, ID Card, Class..."
         class="px-4 py-2 w-72 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400 transition"
       />
     </div>
@@ -91,9 +111,9 @@ const nextPage = () => {
         <thead class="bg-pink-100 text-gray-700 text-md">
           <tr>
             <th class="px-6 py-4">Student ID</th>
-            <th class="px-6 py-4">Name</th>
-            <th class="px-6 py-4">Book Issued</th>
-            <th class="px-6 py-4">Department</th>
+            <th class="px-6 py-4">Full Name</th>
+            <th class="px-6 py-4">ID Card</th>
+            <th class="px-6 py-4">Class</th>
           </tr>
         </thead>
         <tbody class="text-gray-700 text-sm">
@@ -103,9 +123,9 @@ const nextPage = () => {
             class="border-t hover:bg-pink-50 transition"
           >
             <td class="px-6 py-4 font-medium">{{ student.id }}</td>
-            <td class="px-6 py-4">{{ student.name }}</td>
-            <td class="px-6 py-4">{{ student.books }}</td>
-            <td class="px-6 py-4">{{ student.department }}</td>
+            <td class="px-6 py-4">{{ student.full_name }}</td>
+            <td class="px-6 py-4">{{ student.id_card }}</td>
+            <td class="px-6 py-4">{{ student.class }}</td>
           </tr>
           <tr v-if="paginatedStudents.length === 0">
             <td colspan="4" class="text-center text-gray-500 py-6">
@@ -116,7 +136,9 @@ const nextPage = () => {
       </table>
     </div>
 
-    <div class="flex justify-between items-center mt-4 max-w-5xl mx-auto text-gray-600 text-sm">
+    <div
+      class="flex justify-between items-center mt-4 max-w-5xl mx-auto text-gray-600 text-sm"
+    >
       <button
         @click="prevPage"
         :disabled="currentPage === 1"
