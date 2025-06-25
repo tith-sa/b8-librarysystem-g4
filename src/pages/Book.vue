@@ -1,7 +1,10 @@
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
 import axios from "axios";
+import { useRouter } from "vue-router";
 import layoutdashboard from "../components/layoutdashboard.vue";
+
+const router = useRouter();
 
 const books = ref([]);
 const filteredBooks = ref([]);
@@ -89,6 +92,34 @@ function prevPage() {
 function nextPage() {
   if (currentPage.value < totalPages.value) currentPage.value++;
 }
+
+// Delete book function
+async function handleDelete(book) {
+  const confirmed = confirm(`Are you sure you want to delete "${book.title}"?`);
+  if (!confirmed) return;
+
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("No token found. Please login.");
+
+    const res = await axios.delete(`http://localhost:3000/api/books/${book.id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    alert(`Book "${book.title}" deleted successfully.`);
+    fetchBooks();
+  } catch (error) {
+    console.error("Failed to delete book:", error);
+    alert("Failed to delete book.");
+  }
+}
+
+// Edit book navigation
+function handleEdit(book) {
+  router.push(`/edit-book/${book.id}`);
+}
 </script>
 
 <template>
@@ -127,11 +158,7 @@ function nextPage() {
           class="px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400 transition"
         >
           <option value="">All Categories</option>
-          <option
-            v-for="cat in categories"
-            :key="cat"
-            :value="cat"
-          >
+          <option v-for="cat in categories" :key="cat" :value="cat">
             {{ cat }}
           </option>
         </select>
@@ -146,6 +173,7 @@ function nextPage() {
               <th class="px-6 py-4">Author</th>
               <th class="px-6 py-4">Category</th>
               <th class="px-6 py-4">Quantity</th>
+              <th class="px-6 py-4">Actions</th>
             </tr>
           </thead>
           <tbody class="text-gray-700 text-sm">
@@ -159,10 +187,24 @@ function nextPage() {
               <td class="px-6 py-4">{{ book.author_name }}</td>
               <td class="px-6 py-4">{{ book.category }}</td>
               <td class="px-6 py-4">{{ book.quantity }}</td>
+              <td class="px-6 py-4 flex gap-2">
+                <button
+                  @click="handleEdit(book)"
+                  class="bg-yellow-300 text-white px-3 py-1 rounded"
+                >
+                  Edit
+                </button>
+                <button
+                  @click="handleDelete(book)"
+                  class="bg-red-400 text-white px-3 py-1 rounded"
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
 
             <tr v-if="paginatedBooks.length === 0">
-              <td colspan="5" class="text-center text-gray-500 py-6">
+              <td colspan="6" class="text-center text-gray-500 py-6">
                 No books found.
               </td>
             </tr>
