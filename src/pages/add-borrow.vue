@@ -5,6 +5,7 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 
+// Form data
 const form = reactive({
   bookId: "",
   studentId: "",
@@ -13,9 +14,13 @@ const form = reactive({
   returnDate: "",
 });
 
+// Save form data to localStorage
 const handleSubmit = () => {
-  alert(`Borrow entry created for student "${form.studentId}" and book "${form.bookId}"`);
-  // Optional: Save to backend here
+  const existing = JSON.parse(localStorage.getItem("borrows") || "[]");
+  existing.push({ ...form });
+  localStorage.setItem("borrows", JSON.stringify(existing));
+
+  alert(`✅ Borrow entry saved for student "${form.studentId}"`);
   router.push("/borrow");
 };
 </script>
@@ -94,9 +99,9 @@ const handleSubmit = () => {
       <div class="sm:col-span-2 flex justify-end mt-4">
         <button
           type="submit"
-          class="bg-pink-500 hover:bg-pink-600 text-white font-bold px-6 py-3 rounded-xl shadow hover:shadow-xl transition"
+          class="cursor-pointer bg-pink-500 hover:bg-pink-600 text-white font-bold px-6 py-3 rounded-xl shadow hover:shadow-xl transition"
         >
-          Add Borrow
+          Save 
         </button>
       </div>
     </form>
