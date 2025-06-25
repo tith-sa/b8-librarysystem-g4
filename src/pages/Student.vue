@@ -12,8 +12,7 @@ const filteredStudents = ref([]);
 const paginatedStudents = ref([]);
 
 // Define the token
-const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImxpYmVyaWFuIiwiaWF0IjoxNzUwNzQ1Njk3fQ.DghyoAIuyX2oyf08QLH30U4NJRBhkGT80Up3Vwolc9Y";
+const token = localStorage.getItem("token")
 
 const fetchStudents = async () => {
   try {

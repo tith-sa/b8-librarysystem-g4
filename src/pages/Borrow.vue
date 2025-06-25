@@ -3,8 +3,7 @@ import { ref, computed, watch, onMounted } from "vue";
 import axios from "axios";
 import layoutdashboard from "../components/layoutdashboard.vue";
 
-// Your token as a string (wrapped in quotes!)
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImxpYmVyaWFuIiwiaWF0IjoxNzUwNzM1MzEzfQ._aPCMT_iEq_Izy6s5q9CZv7BrwANN0cb1idQYwIz8-8";
+const token = localStorage.getItem("token")
 
 const allBorrows = ref([]);
 const filteredBorrows = ref([]);
@@ -16,7 +15,7 @@ let debounceTimeout = null;
 
 const formatDateTime = (dateString) => {
   const date = new Date(dateString);
-  return `${date.toISOString().slice(0, 10)} ${date.toTimeString().slice(0, 5)}`; // YYYY-MM-DD HH:mm
+  return `${date.toISOString().slice(0, 10)} ${date.toTimeString().slice(0, 5)}`; 
 };
 
 const fetchBorrows = async () => {
@@ -42,7 +41,7 @@ const fetchBorrows = async () => {
     totalPages.value = res.data.totalPages;
   } catch (error) {
     console.error("Error fetching borrows:", error);
-    alert("⚠️ Unauthorized or fetch error. Please check your token and API.");
+    alert(" Unauthorized or fetch error. Please check your token and API.");
   }
 };
 
