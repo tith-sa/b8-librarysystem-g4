@@ -3,34 +3,48 @@ import { ref, computed, watch, onMounted } from "vue";
 import axios from "axios";
 import layoutdashboard from "../components/layoutdashboard.vue";
 
-const token = import.meta.env.VITE_API_TOKEN;
+// Token (you provided it)
+const token =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImxpYmVyaWFuIiwiaWF0IjoxNzUwODE4NTIxfQ.-JXoYShDSz_Bdg98k2_5HNUNyA2rAd4gnRE8gYuTCGg";
+
 const allBorrows = ref([]);
+const filteredBorrows = ref([]);
 const searchQuery = ref("");
 const currentPage = ref(1);
 const itemsPerPage = 10;
-const filteredBorrows = ref([]);
+const totalPages = ref(1);
+let debounceTimeout = null;
 
-onMounted(() => {
-  fetchBorrows();
-});
-
+// Fetch borrow data from API with token
 const fetchBorrows = async () => {
   try {
-    const response = await axios.get("https://api.example.com/borrows", {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    allBorrows.value = response.data;
+    const res = await axios.get(
+      `http://localhost:3000/api/borrows?page=${currentPage.value}&limit=${itemsPerPage}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    allBorrows.value = res.data.borrows.map((item) => ({
+      studentId: item.id_card,
+      bookId: item.title,
+      author: item.full_name,
+      borrowDate: item.borrow_date.slice(0, 10),
+      returnDate: item.return_date.slice(0, 10),
+    }));
     filteredBorrows.value = [...allBorrows.value];
+    totalPages.value = res.data.totalPages;
   } catch (error) {
     console.error("Error fetching borrows:", error);
+    alert("⚠️ Unauthorized. Please check your token.");
   }
 };
 
-let debounceTimeout = null;
+onMounted(fetchBorrows);
+
+// Watch search input
 watch(searchQuery, (val) => {
   clearTimeout(debounceTimeout);
   debounceTimeout = setTimeout(() => {
@@ -50,16 +64,18 @@ const paginatedBorrows = computed(() => {
   return filteredBorrows.value.slice(start, start + itemsPerPage);
 });
 
-const totalPages = computed(() =>
-  Math.ceil(filteredBorrows.value.length / itemsPerPage)
-);
-
 const prevPage = () => {
-  if (currentPage.value > 1) currentPage.value--;
+  if (currentPage.value > 1) {
+    currentPage.value--;
+    fetchBorrows();
+  }
 };
 
 const nextPage = () => {
-  if (currentPage.value < totalPages.value) currentPage.value++;
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+    fetchBorrows();
+  }
 };
 </script>
 
@@ -87,7 +103,7 @@ const nextPage = () => {
       <input
         v-model="searchQuery"
         type="text"
-        placeholder="Search by Student ID, Book ID, Author..."
+        placeholder="Search by Student ID, Book Title, or Name..."
         class="px-4 py-2 w-72 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400 transition"
       />
     </div>
@@ -97,8 +113,8 @@ const nextPage = () => {
         <thead class="bg-pink-100 text-gray-700 text-md">
           <tr>
             <th class="px-6 py-4">Student ID</th>
-            <th class="px-6 py-4">Book ID</th>
-            <th class="px-6 py-4">Author</th>
+            <th class="px-6 py-4">Book Title</th>
+            <th class="px-6 py-4">Student Name</th>
             <th class="px-6 py-4">Borrow Date</th>
             <th class="px-6 py-4">Return Date</th>
           </tr>
