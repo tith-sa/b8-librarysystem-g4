@@ -1,20 +1,18 @@
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
-import layoutdashboard from "../components/layoutdashboard.vue";
 import { useRouter } from "vue-router";
-
-const router = useRouter();
+import layoutdashboard from "../components/layoutdashboard.vue";
 
 const searchQuery = ref("");
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
-
 const totalPages = ref(0);
 const totalStudents = ref(0);
 const filteredStudents = ref([]);
 const paginatedStudents = ref([]);
 
-// Define the token
+const router = useRouter();
+
 const token = localStorage.getItem("token");
 
 const fetchStudents = async () => {
@@ -42,6 +40,37 @@ const fetchStudents = async () => {
   }
 };
 
+// Delete student
+async function handleDelete(student) {
+  const confirmed = confirm(`Are you sure you want to delete ${student.full_name}?`);
+  if (!confirmed) return;
+
+  try {
+    const response = await fetch(`http://localhost:3000/api/students/${student.id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete student");
+    }
+
+    alert("Student deleted successfully");
+    fetchStudents();
+  } catch (error) {
+    console.error("Error deleting student:", error);
+    alert("Error deleting student. Please check token and server.");
+  }
+}
+
+// Navigate to edit page
+function handleEdit(student) {
+  router.push(`/edit-student/${student.id}`);
+}
+
 // Search functionality with debounce
 let debounceTimeout = null;
 watch(searchQuery, (val) => {
@@ -58,38 +87,6 @@ watch(searchQuery, (val) => {
   }, 300);
 });
 
-// Delete student function
-const handleDelete = async (student) => {
-  const confirmed = confirm(`Are you sure you want to delete ${student.full_name}?`);
-  if (!confirmed) return;
-
-  try {
-    const res = await fetch(`http://localhost:3000/api/students/${student.id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!res.ok) {
-      throw new Error("Failed to delete student");
-    }
-
-    alert("Student deleted successfully.");
-    fetchStudents(); // refresh
-  } catch (error) {
-    console.error("Error deleting student:", error);
-    alert("Error deleting student.");
-  }
-};
-
-// Edit handler (example using Vue Router)
-const handleEdit = (student) => {
-  router.push(`/edit-student/${student.id}`);
-};
-
-// Fetch students on mount
 onMounted(() => {
   fetchStudents();
 });
@@ -114,8 +111,12 @@ const nextPage = () => {
   <div class="bg-[#F8F8E1] rounded-2xl shadow ms-72 p-10 max-w-6xl mx-auto">
     <div class="mb-10">
       <h1 class="text-4xl font-extrabold text-gray-800">Welcome to</h1>
-      <h1 class="text-4xl font-extrabold text-pink-500 -mt-9.5 ms-56">Students Page</h1>
-      <p class="text-gray-600 text-sm mt-2">June 11, 2025 | Wednesday, 8:00 AM</p>
+      <h1 class="text-4xl font-extrabold text-pink-500 -mt-9.5 ms-56">
+        Students Page
+      </h1>
+      <p class="text-gray-600 text-sm mt-2">
+        June 11, 2025 | Wednesday, 8:00 AM
+      </p>
     </div>
 
     <div class="flex flex-wrap justify-between items-center mb-6 gap-3">
@@ -159,26 +160,30 @@ const nextPage = () => {
             <td class="px-6 py-4 flex gap-2">
               <button
                 @click="handleEdit(student)"
-                class="bg-yellow-300 text-white px-3 py-1 rounded"
+                class="bg-yellow-300 text-white px-3 py-1 rounded cursor-pointer"
               >
                 Edit
               </button>
               <button
                 @click="handleDelete(student)"
-                class="bg-red-400 text-white px-3 py-1 rounded"
+                class="bg-red-400 text-white px-3 py-1 rounded cursor-pointer"
               >
                 Delete
               </button>
             </td>
           </tr>
           <tr v-if="paginatedStudents.length === 0">
-            <td colspan="5" class="text-center text-gray-500 py-6">No students found.</td>
+            <td colspan="5" class="text-center text-gray-500 py-6">
+              No students found.
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <div class="flex justify-between items-center mt-4 max-w-5xl mx-auto text-gray-600 text-sm">
+    <div
+      class="flex justify-between items-center mt-4 max-w-5xl mx-auto text-gray-600 text-sm"
+    >
       <button
         @click="prevPage"
         :disabled="currentPage === 1"
@@ -186,7 +191,9 @@ const nextPage = () => {
       >
         ← Prev
       </button>
+
       <span>Page {{ currentPage }} of {{ totalPages }}</span>
+
       <button
         @click="nextPage"
         :disabled="currentPage === totalPages"

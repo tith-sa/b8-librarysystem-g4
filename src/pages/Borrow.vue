@@ -80,16 +80,6 @@ const nextPage = () => {
     fetchBorrows();
   }
 };
-
-const handleEdit = (borrow) => {
-  alert(`📝 Edit borrow for ${borrow.studentId}`);
-};
-
-const handleDelete = (borrow) => {
-  if (confirm(`❌ Delete borrow record for ${borrow.studentId}?`)) {
-    alert(`Deleted! (You can now implement DELETE API here)`);
-  }
-};
 </script>
 
 <template>
@@ -114,7 +104,7 @@ const handleDelete = (borrow) => {
       <input
         v-model="searchQuery"
         type="text"
-        placeholder="Search by Student ID, Book ID, or Author..."
+        placeholder="Search book by title.."
         class="px-4 py-2 w-72 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400 transition"
       />
     </div>
@@ -124,11 +114,10 @@ const handleDelete = (borrow) => {
         <thead class="bg-pink-100 text-gray-700 text-md">
           <tr>
             <th class="px-6 py-4">Student ID</th>
-            <th class="px-6 py-4">Book ID</th>
+            <th class="px-6 py-4">Book Title</th>
             <th class="px-6 py-4">Author</th>
             <th class="px-6 py-4">Borrow Date</th>
             <th class="px-6 py-4">Return Date</th>
-            <th class="px-6 py-4">Actions</th>
           </tr>
         </thead>
         <tbody class="text-gray-700 text-sm">
@@ -142,10 +131,6 @@ const handleDelete = (borrow) => {
             <td class="px-6 py-4">{{ borrow.author }}</td>
             <td class="px-6 py-4">{{ borrow.borrowDate }}</td>
             <td class="px-6 py-4">{{ borrow.returnDate }}</td>
-            <td class="px-6 py-4 flex gap-2">
-              <button @click="handleEdit(borrow)" class="bg-yellow-300 text-white px-3 py-1 rounded">Edit</button>
-              <button @click="handleDelete(borrow)" class="bg-red-400 text-white px-3 py-1 rounded">Delete</button>
-            </td>
           </tr>
           <tr v-if="paginatedBorrows.length === 0">
             <td colspan="6" class="text-center text-gray-500 py-6">No results found.</td>
