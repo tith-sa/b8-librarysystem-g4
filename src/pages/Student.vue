@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import layoutdashboard from "../components/layoutdashboard.vue";
 
@@ -12,7 +12,6 @@ const filteredStudents = ref([]);
 const paginatedStudents = ref([]);
 
 const router = useRouter();
-
 const token = localStorage.getItem("token");
 
 const fetchStudents = async () => {
@@ -26,21 +25,20 @@ const fetchStudents = async () => {
         },
       }
     );
-    if (!response.ok) {
-      throw new Error(`Error: ${response.status} ${response.statusText}`);
-    }
+    if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+
     const data = await response.json();
     totalPages.value = data.totalPages;
     totalStudents.value = data.totalStudents;
     filteredStudents.value = data.students;
-    paginatedStudents.value = data.students;
+    applySearch();
   } catch (error) {
-    console.error("Failed to fetch students:", error);
-    alert("Failed to load students. Please check your token or API endpoint.");
+    console.error("❌ Failed to fetch students:", error);
+    alert("Failed to load students. Check your token or API endpoint.");
   }
 };
 
-// Delete student
+// ✅ Delete student
 async function handleDelete(student) {
   const confirmed = confirm(`Are you sure you want to delete ${student.full_name}?`);
   if (!confirmed) return;
@@ -54,49 +52,65 @@ async function handleDelete(student) {
       },
     });
 
+    // ✅ Check response (handle 204 or error JSON)
+    const result = response.status !== 204 ? await response.json() : {};
     if (!response.ok) {
-      throw new Error("Failed to delete student");
+      console.error("Backend error:", result);
+      throw new Error(result.error || "Failed to delete student");
     }
 
-    alert("Student deleted successfully");
-    fetchStudents();
+    alert("✅ Student deleted successfully");
+
+    // ✅ Adjust pagination if needed
+    if (paginatedStudents.value.length === 1 && currentPage.value > 1) {
+      currentPage.value--;
+    }
+
+    await fetchStudents();
   } catch (error) {
-    console.error("Error deleting student:", error);
-    alert("Error deleting student. Please check token and server.");
+    console.error("❌ Error deleting student:", error);
+    alert("Failed to delete student. See console for details.");
   }
 }
 
-// Navigate to edit page
+// Edit student
 function handleEdit(student) {
   router.push(`/edit-student/${student.id}`);
 }
 
-// Search functionality with debounce
+// ✅ Search with debounce
 let debounceTimeout = null;
-watch(searchQuery, (val) => {
+watch(searchQuery, () => {
   clearTimeout(debounceTimeout);
   debounceTimeout = setTimeout(() => {
-    const query = val.toLowerCase();
-    paginatedStudents.value = filteredStudents.value.filter(
-      (s) =>
-        s.full_name.toLowerCase().includes(query) ||
-        s.id_card.toLowerCase().includes(query) ||
-        s.class.toLowerCase().includes(query)
-    );
-    currentPage.value = 1;
+    applySearch();
   }, 300);
 });
+
+// Apply search filter
+function applySearch() {
+  const query = searchQuery.value.toLowerCase();
+  const result = filteredStudents.value.filter(
+    (s) =>
+      s.full_name.toLowerCase().includes(query) ||
+      s.id_card.toLowerCase().includes(query) ||
+      s.class.toLowerCase().includes(query)
+  );
+  paginatedStudents.value = result;
+}
 
 onMounted(() => {
   fetchStudents();
 });
 
+// Pagination controls
 const prevPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--;
     fetchStudents();
   }
 };
+
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
     currentPage.value++;
@@ -104,6 +118,7 @@ const nextPage = () => {
   }
 };
 </script>
+
 
 <template>
   <layoutdashboard />
@@ -156,7 +171,7 @@ const nextPage = () => {
             <td class="px-6 py-4 font-medium">{{ student.id }}</td>
             <td class="px-6 py-4">{{ student.full_name }}</td>
             <td class="px-6 py-4">{{ student.id_card }}</td>
-            <td class="px-6 py-4">{{ student.class }}</td>
+            <td class="px-6 py-4">{{ student.class.toUpperCase() }}</td>
             <td class="px-6 py-4 flex gap-2">
               <button
                 @click="handleEdit(student)"
